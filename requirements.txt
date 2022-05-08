@@ -5,3 +5,5 @@ pymysql
 sqlalchemy
 starlette==0.18.0
 uvicorn
+python-dotenv
+psycopg2

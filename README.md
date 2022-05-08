@@ -17,5 +17,11 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
+## OR use docker
+```
+docker-compose build
+docker-compose up
+```
+
 ### Customize configuration
 See [Configuration Reference](https://fastapi.tiangolo.com/).
