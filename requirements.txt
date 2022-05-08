@@ -1,0 +1,7 @@
+fastapi
+gunicorn
+pydantic
+pymysql
+sqlalchemy
+starlette==0.18.0
+uvicorn
