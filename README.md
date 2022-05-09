@@ -1,5 +1,16 @@
 api.epooling.fastapi
 # Installation
+## Env file settings
+Create an .env file in root and set this params
+```
+DATABASE_URL=
+DB_USER=
+DB_PASSWORD=
+DB_NAME= 
+PGADMIN_EMAIL=
+PGADMIN_PASSWORD=
+POSTGRES_PASSWORD=
+```
 ## Simple installation
 ### Virtual env
 ```
@@ -18,18 +29,7 @@ uvicorn main:app --reload
 ```
 
 ## Docker installation
-### Env file settings
-Create an .env file in root and set this params
-```
-DATABASE_URL=
-DB_USER=
-DB_PASSWORD=
-DB_NAME= 
-PGADMIN_EMAIL=
-PGADMIN_PASSWORD=
-POSTGRES_PASSWORD=
-```
-And run docker like this
+Just run docker like this
 ```
 docker-compose build
 docker-compose up
