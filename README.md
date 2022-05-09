@@ -1,7 +1,7 @@
 api.epooling.fastapi
 # Installation
 ## Env file settings
-Create an .env file in root and set this params
+Create an ```.env``` file in root and set this params
 ```
 DATABASE_URL=
 DB_USER=
