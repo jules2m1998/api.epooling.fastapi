@@ -21,13 +21,13 @@ uvicorn main:app --reload
 ### Env file settings
 Create an .env file in root and set this params
 ```
-DATABASE_URL=postgresql+psycopg2://postgres:password@db:5432/book_db
-DB_USER=postgres
-DB_PASSWORD=password
-DB_NAME=book_db 
-PGADMIN_EMAIL=admin@admin.com
-PGADMIN_PASSWORD=admin
-POSTGRES_PASSWORD=password
+DATABASE_URL=
+DB_USER=
+DB_PASSWORD=
+DB_NAME= 
+PGADMIN_EMAIL=
+PGADMIN_PASSWORD=
+POSTGRES_PASSWORD=
 ```
 And run docker like this
 ```
