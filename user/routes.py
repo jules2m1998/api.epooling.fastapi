@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, Response, status
 from config import SessionLocal
 from controllers import Controllers
@@ -30,7 +31,7 @@ def setter_person(p: Person, subperson: PersonSchema):
 
 
 
-@router.post('/person', status_code=status.HTTP_201_CREATED)
+@router.post('/person', status_code=status.HTTP_201_CREATED, response_model=PersonSchema)
 async def create_person(request: PersonSchema, response: Response, db: Session = Depends(get_db)):
     try:
         return controller.create(db=db, item = request, method = setter_person)
@@ -38,11 +39,11 @@ async def create_person(request: PersonSchema, response: Response, db: Session =
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {}
 
-@router.get('/person', status_code=status.HTTP_200_OK)
+@router.get('/person', status_code=status.HTTP_200_OK, response_model=List[PersonSchema])
 async def get_persons(db: Session = Depends(get_db)):
     return controller.get(db=db)
 
-@router.get('/person/{id}', status_code=status.HTTP_200_OK)
+@router.get('/person/{id}', status_code=status.HTTP_200_OK, response_model=PersonSchema)
 async def get_person(id: int, response: Response, db: Session = Depends(get_db)):
     try:
         _item = controller.retrieve(db=db, id=id)
@@ -51,7 +52,7 @@ async def get_person(id: int, response: Response, db: Session = Depends(get_db))
         response.status_code = status.HTTP_404_NOT_FOUND
         return {}
 
-@router.put('/person', status_code=status.HTTP_200_OK)
+@router.put('/person', status_code=status.HTTP_200_OK, response_model=PersonSchema)
 async def get_persons(request: PersonSchema, response: Response, db: Session = Depends(get_db)):
     try:
         return controller.update(db, id=request.id, item=request, method = setter_person)
@@ -59,7 +60,7 @@ async def get_persons(request: PersonSchema, response: Response, db: Session = D
         response.status_code = status.HTTP_404_NOT_FOUND
         return {}
 
-@router.delete('/person/{id}', status_code=status.HTTP_200_OK)
+@router.delete('/person/{id}', status_code=status.HTTP_200_OK, response_model=PersonSchema)
 async def get_persons(id: int, response: Response, db: Session = Depends(get_db)):
     try:
         return userController.delete(db, id=id)
