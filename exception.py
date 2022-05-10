@@ -1,11 +1,12 @@
-class NotFound404(Exception):
-    """Exception raised for errors in the input salary.
+from fastapi import HTTPException, status
 
-    Attributes:
-        salary -- input salary which caused the error
-        message -- explanation of the error
-    """
+credentials_exception = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
-    def __init__(self, message="404 element not found !"):
-        self.message = message
-        super().__init__(self.message)
+not_found_404 = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail="404 not found !",
+)

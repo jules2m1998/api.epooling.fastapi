@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class PersonSchema(BaseModel):
-    id: int = None
-    phone: int = None
-    phone_ex: str = None
-    first_name: str = None
-    last_name : str = None
-    sex: int = None
+    id: int = Field(None)
+    phone: int = Field(None)
+    phone_ex: str = Field(None)
+    first_name: str = Field(None)
+    last_name : str = Field(None)
+    sex: int = Field(None)
 
 class SocietySchema(BaseModel):
     id: str

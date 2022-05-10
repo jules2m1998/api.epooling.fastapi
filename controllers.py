@@ -1,16 +1,16 @@
-from typing import List, TypeVar
+from typing import Generic, List, TypeVar
 from unittest.mock import call
 from config import Base
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-
-from exception import NotFound404
+from exception import not_found_404
 
 
 T = TypeVar('T', bound=Base)
 TS = TypeVar('TS', bound=BaseModel)
 
-class Controllers:
+
+class Controllers(Generic[T, TS]):
 
     def __init__(self, cls: T) -> None:
         self.cls = cls
@@ -30,9 +30,17 @@ class Controllers:
         if _item:
             return _item
         else:
-            raise NotFound404()
+            raise not_found_404
     
-    def update(self, db: Session, id: int, item: TS, method: callable) -> T:
+    
+    def retrieveUsername(self,db: Session, username: str = 0,) -> T:
+        _item = db.query(self.cls).filter(self.cls.username == username).first()
+        if _item:
+            return _item
+        else:
+            raise not_found_404
+    
+    def update(self, db: Session, id: int, item: TS, method: callable) -> TS:
         _item = self.retrieve(db=db, id=id)
         if _item:
             _item = method(_item, item)
@@ -41,7 +49,7 @@ class Controllers:
             print(_item.__dict__)
             return _item
         else:
-            raise NotFound404()
+            raise not_found_404
 
     def delete(self, db: Session, id: int = 0) -> T:
         _item = self.retrieve(db=db, id=id)
@@ -50,4 +58,4 @@ class Controllers:
             db.commit()
             return _item
         else:
-            raise NotFound404()
+            raise not_found_404
