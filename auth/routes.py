@@ -3,7 +3,7 @@ from fastapi import APIRouter, status, Depends
 from controllers import Controllers
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from .models import Account
-from .utils import get_password_hash, verify_password, create_access_token, Token
+from .utils import get_password_hash, verify_password, create_access_token, Token, Account as AccountSchema
 from config import SessionLocal
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -36,10 +36,11 @@ def setter_account(_account: Account, account: OAuth2PasswordRequestForm):
     return _account
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED)
+@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=AccountSchema)
 async def signup(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    print(form_data)
-    return controllers.create(db=db, item = form_data, method=setter_account)
+    return {
+        'username': controllers.create(db=db, item = form_data, method=setter_account).username
+    }
 
 
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
