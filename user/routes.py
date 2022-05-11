@@ -1,62 +1,22 @@
 from typing import List
 from fastapi import APIRouter, Depends, Response, status
-from config import SessionLocal
 from controllers import Controllers
-from .schemas import PersonSchema, UserSchema
+from .controllers import Controller as UserPersonController
+from .schemas import PersonSchema, UserSchema, UserPersonSchema
 from .models import Person, User
 from sqlalchemy.orm import Session
+from .utils import create_person_method, create_user_method, get_db, setter_person_method, setter_user_method
 
+# Const declaration
 
 router = APIRouter()
 controller = Controllers[Person, PersonSchema](Person)
 user_conttroller = Controllers[User, UserSchema](User)
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# -------------------------------------------------------
 
 
-def create_person_method(p: PersonSchema):
-    _p = Person(
-        first_name=p.first_name, 
-        last_name=p.last_name, 
-        sex=p.sex, 
-        user_id=p.user_id
-    )
-    return _p
-
-
-def setter_person_method(p: Person, subperson: PersonSchema):
-    p.first_name = subperson.first_name
-    p.last_name = subperson.last_name
-    p.user_id = subperson.phone_ex
-    p.sex = subperson.sex
-
-    return p
-
-
-def create_user_method(u: UserSchema):
-    _u = User(
-        phone = u.phone,
-        phone_ex = u.phone_ex,
-        avatar_url = u.avatar_url,
-        email = u.email,
-    )
-    return _u
-
-
-def setter_user_method(_u: User, u: UserSchema):
-    _u.phone = u.phone
-    _u.phone_ex = u.phone_ex
-    _u.avatar_url = u.avatar_url
-    _u.email = u.email
-
-    return _u
-
+# Simple user APIs
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_user(request: UserSchema, db: Session = Depends(get_db)):
@@ -73,7 +33,7 @@ async def get_users(db: Session = Depends(get_db)):
     return user_conttroller.get(db=db)
 
 
-@router.get('/{id}', status_code=status.HTTP_200_OK)
+@router.get('/one/{id}', status_code=status.HTTP_200_OK)
 async def get_user(id: int, db: Session = Depends(get_db)):
     return user_conttroller.retrieve(db=db, id=id)
 
@@ -82,8 +42,20 @@ async def get_user(id: int, db: Session = Depends(get_db)):
 async def delete_user(id: int, db: Session = Depends(get_db)):
     return user_conttroller.delete(db=db, id=id)
 
+## -------------------------------------------------------
+
+# User type APIs
+
+@router.post('/user_person', status_code=status.HTTP_201_CREATED)
+async def create_user_person(request: UserPersonSchema, db: Session = Depends(get_db)):
+    return UserPersonController.create_user_person(request, db)
+
+## -------------------------------------------------------
 
 
+# Person APIs
+
+# Create person api
 @router.post('/person', status_code=status.HTTP_201_CREATED)
 async def create_person(request: PersonSchema, response: Response, db: Session = Depends(get_db)):
     try:
@@ -94,19 +66,25 @@ async def create_person(request: PersonSchema, response: Response, db: Session =
             'detail': 'Bad request !'
         }
 
+# Get all persons api
 @router.get('/person', status_code=status.HTTP_200_OK)
 async def get_persons(db: Session = Depends(get_db)):
     return controller.get(db=db)
 
+# Get person api
 @router.get('/person/{id}', status_code=status.HTTP_200_OK)
 async def get_person(id: int, db: Session = Depends(get_db)):
     _item = controller.retrieve(db=db, id=id)
     return _item
 
+# update person api
 @router.put('/person', status_code=status.HTTP_200_OK)
-async def get_persons(request: PersonSchema, db: Session = Depends(get_db)):
+async def update_person(request: PersonSchema, db: Session = Depends(get_db)):
     return controller.update(db, id=request.id, item=request, method = setter_person_method)
 
+# Delete person api
 @router.delete('/person/{id}', status_code=status.HTTP_200_OK)
-async def get_persons(id: int, response: Response, db: Session = Depends(get_db)):
+async def delete(id: int, response: Response, db: Session = Depends(get_db)):
     return controller.delete(db, id=id)
+
+## -------------------------------------------------------

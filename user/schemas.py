@@ -21,3 +21,15 @@ class UserSchema(BaseModel):
     phone_ex: str = Field(None)
     avatar_url: str = Field(None)
     email: str = Field(None)
+    account_id: str = Field(None)
+
+
+class UserPersonSchema(BaseModel):
+    first_name: str = Field(None)
+    last_name : str = Field(None)
+    sex: int = Field(None)
+    phone: int = Field(None)
+    phone_ex: str = Field(None)
+    avatar_url: str = Field(None)
+    email: str = Field(None)
+    account_id: int = Field(None)

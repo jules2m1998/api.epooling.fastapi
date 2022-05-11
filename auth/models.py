@@ -1,6 +1,7 @@
 from typing import Any
-from sqlalchemy import  Column, Integer, String, DateTime
+from sqlalchemy import  Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from config import Base
 
 class Account(Base):

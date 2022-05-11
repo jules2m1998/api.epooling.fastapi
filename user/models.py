@@ -1,6 +1,6 @@
 from sqlalchemy import  Column, Integer, String, ForeignKey, DateTime, Text
 from config import Base
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 class User(Base):
@@ -13,6 +13,12 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
 
+    account_id = Column(Integer, ForeignKey('account.id'))
+    
+    person = relationship("Person")
+    society = relationship("Society")
+    account = relationship("Account")
+
     def __repr__(self):
         return "<User %r>" % self.id
 
@@ -24,7 +30,7 @@ class Person(Base):
     last_name = Column(String, nullable=False)
     sex = Column(Integer, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User")
+    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self):
         return "<Person %r>" % self.id
@@ -35,7 +41,7 @@ class Society(Base):
     desc = Column(String, nullable = False)
     location = Column(String, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User")
+    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self):
         return "<Society %r>" % self.id

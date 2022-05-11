@@ -1,11 +1,11 @@
-import models
 from config import engine
 from fastapi import FastAPI
 from user.routes import router as user_router
+from user.models import Base
 from auth.routes import router as auth_router
 from fastapi.responses import RedirectResponse
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

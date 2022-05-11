@@ -23,7 +23,11 @@ class Controllers(Generic[T, TS]):
         return _item
 
     def get(self, db: Session, skip: int = 0, limit: int = 100) -> List[T]:
-        return db.query(self.cls).offset(skip).limit(limit).all()
+        try:
+            return db.query(self.cls).offset(skip).limit(limit).all()
+        except Exception as es:
+            print(es)
+            raise es
     
     def retrieve(self,db: Session, id: int = 0,) -> T:
         _item = db.query(self.cls).filter(self.cls.id == id).first()
