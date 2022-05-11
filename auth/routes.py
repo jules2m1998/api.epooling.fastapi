@@ -46,7 +46,8 @@ def create_account(p: OAuth2PasswordRequestForm):
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=AccountSchema)
 async def signup(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     return {
-        'username': controllers.create(db=db, item = form_data, method=create_account).username
+        'username': controllers.create(db=db, item = form_data, method=create_account).username,
+        'id': controllers.create(db=db, item = form_data, method=create_account).id
     }
 
 
