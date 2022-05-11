@@ -16,8 +16,8 @@ class Controllers(Generic[T, TS]):
         self.cls = cls
 
     def create(self, db: Session, item: TS, method: callable) -> T:
-        _item = self.cls()
-        db.add(method(_item, item))
+        _item = method(item)
+        db.add(_item)
         db.commit()
         db.refresh(_item)
         return _item

@@ -35,11 +35,18 @@ def setter_account(_account: Account, account: OAuth2PasswordRequestForm):
     _account.hashed_password = get_password_hash(account.password)
     return _account
 
+def create_account(p: OAuth2PasswordRequestForm):
+    _p = Account(
+        username = p.username,
+        hashed_password = get_password_hash(p.password)
+    )
+    return _p
+
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=AccountSchema)
 async def signup(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     return {
-        'username': controllers.create(db=db, item = form_data, method=setter_account).username
+        'username': controllers.create(db=db, item = form_data, method=create_account).username
     }
 
 
