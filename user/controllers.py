@@ -28,7 +28,4 @@ class Controller:
         except:
             db.rollback()
             raise bad_request
-        return {
-            'user': _u,
-            'person': _p
-        }
+        return _u

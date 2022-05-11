@@ -18,27 +18,28 @@ user_conttroller = Controllers[User, UserSchema](User)
 
 # Simple user APIs
 
-@router.post('/', status_code=status.HTTP_201_CREATED)
+@router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
 async def create_user(request: UserSchema, db: Session = Depends(get_db)):
     return user_conttroller.create(db=db, item=request, method=create_user_method)
 
 
-@router.put('/', status_code=status.HTTP_200_OK)
+@router.put('/', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def uppdate_user(request: UserSchema, db: Session = Depends(get_db)):
     return user_conttroller.create(db=db, item=request, method=setter_user_method)
 
 
-@router.get('/', status_code=status.HTTP_200_OK)
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserSchema])
 async def get_users(db: Session = Depends(get_db)):
     return user_conttroller.get(db=db)
 
 
-@router.get('/one/{id}', status_code=status.HTTP_200_OK)
+@router.get('/one/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def get_user(id: int, db: Session = Depends(get_db)):
+    u = user_conttroller.retrieve(db=db, id=id)
     return user_conttroller.retrieve(db=db, id=id)
 
 
-@router.delete('/{id}', status_code=status.HTTP_200_OK)
+@router.delete('/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def delete_user(id: int, db: Session = Depends(get_db)):
     return user_conttroller.delete(db=db, id=id)
 
@@ -46,7 +47,7 @@ async def delete_user(id: int, db: Session = Depends(get_db)):
 
 # User type APIs
 
-@router.post('/user_person', status_code=status.HTTP_201_CREATED)
+@router.post('/user_person', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
 async def create_user_person(request: UserPersonSchema, db: Session = Depends(get_db)):
     return UserPersonController.create_user_person(request, db)
 

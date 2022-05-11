@@ -1,6 +1,7 @@
+from turtle import backward
 from sqlalchemy import  Column, Integer, String, ForeignKey, DateTime, Text
 from config import Base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import func
 
 class User(Base):
@@ -15,8 +16,8 @@ class User(Base):
 
     account_id = Column(Integer, ForeignKey('account.id'))
     
-    person = relationship("Person")
-    society = relationship("Society")
+    person = relationship("Person", back_populates = 'user', uselist=False, cascade="all, delete-orphan")
+    society = relationship("Society", backref=backref("user", uselist=False), uselist=False, cascade="all, delete-orphan")
     account = relationship("Account")
 
     def __repr__(self):
@@ -30,7 +31,7 @@ class Person(Base):
     last_name = Column(String, nullable=False)
     sex = Column(Integer, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", foreign_keys=[user_id])
+    user = relationship("User", back_populates = 'person', uselist=False)
 
     def __repr__(self):
         return "<Person %r>" % self.id
@@ -41,7 +42,6 @@ class Society(Base):
     desc = Column(String, nullable = False)
     location = Column(String, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", foreign_keys=[user_id])
 
     def __repr__(self):
         return "<Society %r>" % self.id

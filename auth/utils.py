@@ -21,6 +21,9 @@ class TokenData(BaseModel):
 
 class Account(BaseModel):
     username: str
+    
+    class Config:
+        orm_mode = True
 
 
 class AccountInDB(Account):
