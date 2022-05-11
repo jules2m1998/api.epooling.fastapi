@@ -2,16 +2,17 @@ from typing import List
 from fastapi import APIRouter, Depends, Response, status
 from controllers import Controllers
 from .controllers import Controller as UserPersonController
-from .schemas import PersonSchema, UserSchema, UserPersonSchema
-from .models import Person, User
+from .schemas import PersonSchema, SocietySchema, UserSchema, UserPersonSchema, UserSimpleSchema, UserSocietySchema
+from .models import Person, Society, User
 from sqlalchemy.orm import Session
-from .utils import create_person_method, create_user_method, get_db, setter_person_method, setter_user_method
+from .utils import create_person_method, create_user_method, get_db, setter_person_method, setter_user_method, create_society_method, setter_society_method
 
 # Const declaration
 
 router = APIRouter()
 controller = Controllers[Person, PersonSchema](Person)
 user_conttroller = Controllers[User, UserSchema](User)
+society_controller = Controllers[Society, SocietySchema](Society)
 
 # -------------------------------------------------------
 
@@ -19,7 +20,7 @@ user_conttroller = Controllers[User, UserSchema](User)
 # Simple user APIs
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
-async def create_user(request: UserSchema, db: Session = Depends(get_db)):
+async def create_user(request: UserSimpleSchema, db: Session = Depends(get_db)):
     return user_conttroller.create(db=db, item=request, method=create_user_method)
 
 
@@ -50,6 +51,10 @@ async def delete_user(id: int, db: Session = Depends(get_db)):
 @router.post('/user_person', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
 async def create_user_person(request: UserPersonSchema, db: Session = Depends(get_db)):
     return UserPersonController.create_user_person(request, db)
+
+@router.post('/user_society', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
+async def create_user_society(request: UserSocietySchema, db: Session = Depends(get_db)):
+    return UserPersonController.create_user_society(request, db)
 
 ## -------------------------------------------------------
 
@@ -89,3 +94,32 @@ async def delete(id: int, response: Response, db: Session = Depends(get_db)):
     return controller.delete(db, id=id)
 
 ## -------------------------------------------------------
+
+
+# Society APIs
+
+# Create society api
+@router.post('/society', status_code=status.HTTP_201_CREATED, response_model=SocietySchema)
+async def create_society(request: SocietySchema, db: Session = Depends(get_db)):
+    return society_controller.create(db=db, item=request, method=create_society_method)
+
+
+@router.get('/society', status_code=status.HTTP_200_OK, response_model=List[SocietySchema])
+async def get_societies(db: Session = Depends(get_db)):
+    print('sdfsdfhjgsdjhkgfjhsgdfhj')
+    return society_controller.get(db=db)
+
+
+@router.get('/society{id}', status_code=status.HTTP_200_OK, response_model=SocietySchema)
+async def get_society(id: int, db: Session = Depends(get_db)):
+    return society_controller.retrieve(db=db, id=id)
+
+
+@router.put('/society', status_code=status.HTTP_200_OK, response_model=SocietySchema)
+async def update_society(request: SocietySchema, db: Session = Depends(get_db)):
+    return society_controller.update(db=db, id=request.id, item=request, method=setter_society_method)
+
+
+@router.delete('/society/{id}', status_code=status.HTTP_200_OK, response_model=SocietySchema)
+async def delete_society(id: int, db: Session = Depends(get_db)):
+    return society_controller.delete(db=db, id=id)

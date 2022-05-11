@@ -17,7 +17,7 @@ class User(Base):
     account_id = Column(Integer, ForeignKey('account.id'))
     
     person = relationship("Person", back_populates = 'user', uselist=False, cascade="all, delete-orphan")
-    society = relationship("Society", backref=backref("user", uselist=False), uselist=False, cascade="all, delete-orphan")
+    society = relationship("Society", back_populates = 'user', uselist=False, cascade="all, delete-orphan")
     account = relationship("Account")
 
     def __repr__(self):
@@ -42,6 +42,7 @@ class Society(Base):
     desc = Column(String, nullable = False)
     location = Column(String, nullable = False)
     user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship("User", back_populates = 'society', uselist=False)
 
     def __repr__(self):
         return "<Society %r>" % self.id

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from pydantic import BaseModel, Field
 from auth.utils import Account
 
@@ -14,6 +14,7 @@ class PersonSchema(Tmp):
     first_name: str = Field(None)
     last_name : str = Field(None)
     sex: int = Field(None)
+    user_id: int = Field(default=None, foreign_key="user.id")
 
     class Config:
         orm_mode = True
@@ -21,22 +22,27 @@ class PersonSchema(Tmp):
 class SocietySchema(Tmp):
     desc: str
     location: str
+    user_id: int = Field(default=None, foreign_key="user.id")
 
     class Config:
         orm_mode = True
 
-class UserSchema(BaseModel):
-    class Config:
-        orm_mode = True
-    
+class UserSimpleSchema(BaseModel):
     id: int
     phone: int
     phone_ex: str
     avatar_url: str
     email: str 
     account_id: int
-    account: Account
-    person: PersonSchema
+
+
+class UserSchema(UserSimpleSchema):
+    class Config:
+        orm_mode = True
+    
+    account: Optional[Account]
+    person: Optional[PersonSchema]
+    society: Optional[SocietySchema]
 
 
 class UserPersonSchema(BaseModel):
@@ -51,3 +57,17 @@ class UserPersonSchema(BaseModel):
 
     class Config:
         orm_mode = True
+    
+
+class UserSocietySchema(BaseModel):
+    desc: str
+    location: str
+    phone: int
+    phone_ex: str
+    avatar_url: str
+    email: str 
+    account_id: int
+
+
+    class Config:
+        orm_mode = False
