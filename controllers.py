@@ -50,7 +50,6 @@ class Controllers(Generic[T, TS]):
             _item = method(_item, item)
             db.commit()
             db.refresh(_item)
-            print(_item.__dict__)
             return _item
         else:
             raise not_found_404

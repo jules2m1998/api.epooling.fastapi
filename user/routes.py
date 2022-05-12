@@ -19,14 +19,14 @@ society_controller = Controllers[Society, SocietySchema](Society)
 
 # Simple user APIs
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
-async def create_user(request: UserSimpleSchema, db: Session = Depends(get_db)):
-    return user_conttroller.create(db=db, item=request, method=create_user_method)
+# @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
+# async def create_user(request: UserSimpleSchema, db: Session = Depends(get_db)):
+#     return user_conttroller.create(db=db, item=request, method=create_user_method)
 
 
 @router.put('/', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def uppdate_user(request: UserSchema, db: Session = Depends(get_db)):
-    return user_conttroller.create(db=db, item=request, method=setter_user_method)
+    return user_conttroller.update(db=db, id=request.id, item=request, method=setter_user_method)
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserSchema])
