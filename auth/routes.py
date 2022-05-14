@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from fastapi import APIRouter, status, Depends
 from controllers import Controllers
 from fastapi.security import OAuth2PasswordRequestForm
@@ -9,15 +8,7 @@ from config import SessionLocal
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from exception import credentials_exception
-import os
-from pathlib import Path
-from os.path import join
-
-dotenv_path = join(Path(__file__).parent.parent.absolute(), '.env')
-load_dotenv(dotenv_path)
-ACCESS_TOKEN_EXPIRE_MINUTES = os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"]
-SECRET_KEY = os.environ['SECRET_KEY']
-ALGORITHM = os.environ['ALGORITHM']
+from conf import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM
 
 
 def get_db():

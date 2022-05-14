@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, Header
 from controllers import Controllers
 from user.controller import Controller as UserPersonController
 from user.schemas import PersonSchema, SocietySchema, UserSchema, UserPersonSchema, UserSocietySchema
@@ -7,6 +7,7 @@ from user.models import Person, Society, User
 from sqlalchemy.orm import Session
 from user.utils import create_person_method, get_db, setter_person_method, setter_user_method, create_society_method, \
     setter_society_method
+from auth.auth_bearer import JWTBearer
 
 # Const declaration
 
@@ -26,8 +27,16 @@ society_controller = Controllers[Society, SocietySchema](Society)
 #     return user_conttroller.create(db=db, item=request, method=create_user_method)
 
 
-@router.put('/', status_code=status.HTTP_200_OK, response_model=UserSchema)
-async def uppdate_user(request: UserSchema, db: Session = Depends(get_db)):
+@router.put(
+    '/',
+    status_code=status.HTTP_200_OK,
+    response_model=UserSchema,
+    dependencies=[Depends(JWTBearer())]
+)
+async def update_user(
+        request: UserSchema,
+        db: Session = Depends(get_db)
+):
     return user_conttroller.update(db=db, id=request.id, item=request, method=setter_user_method)
 
 
@@ -38,7 +47,6 @@ async def get_users(db: Session = Depends(get_db)):
 
 @router.get('/one/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def get_user(id: int, db: Session = Depends(get_db)):
-    u = user_conttroller.retrieve(db=db, id=id)
     return user_conttroller.retrieve(db=db, id=id)
 
 
@@ -68,14 +76,8 @@ async def create_user_society(request: UserSocietySchema, db: Session = Depends(
 
 # Create person api
 @router.post('/person', status_code=status.HTTP_201_CREATED)
-async def create_person(request: PersonSchema, response: Response, db: Session = Depends(get_db)):
-    try:
-        return controller.create(db=db, item=request, method=create_person_method)
-    except:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return {
-            'detail': 'Bad request !'
-        }
+async def create_person(request: PersonSchema, db: Session = Depends(get_db)):
+    return controller.create(db=db, item=request, method=create_person_method)
 
 
 # Get all persons api
@@ -116,7 +118,6 @@ async def create_society(request: SocietySchema, db: Session = Depends(get_db)):
 
 @router.get('/society', status_code=status.HTTP_200_OK, response_model=List[SocietySchema])
 async def get_societies(db: Session = Depends(get_db)):
-    print('sdfsdfhjgsdjhkgfjhsgdfhj')
     return society_controller.get(db=db)
 
 
@@ -128,7 +129,6 @@ async def get_society(id: int, db: Session = Depends(get_db)):
 @router.put('/society', status_code=status.HTTP_200_OK, response_model=SocietySchema)
 async def update_society(request: SocietySchema, db: Session = Depends(get_db)):
     return society_controller.update(db=db, id=request.id, item=request, method=setter_society_method)
-
 
 # @router.delete('/society/{id}', status_code=status.HTTP_200_OK, response_model=SocietySchema)
 # async def delete_society(id: int, db: Session = Depends(get_db)):

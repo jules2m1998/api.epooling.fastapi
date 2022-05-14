@@ -9,6 +9,7 @@ from exception import credentials_exception
 from auth.models import Account as AccountModel
 from controllers import Controllers
 from sqlalchemy.orm import Session
+from conf import ALGORITHM, SECRET_KEY
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
@@ -56,10 +57,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None, s
     return encoded_jwt
 
 
-async def get_current_user(token: str, db: Session, secret, algorithm):
+async def get_current_user(token: str, db: Session):
     try:
-        payload = jwt.decode(token=token, key=secret, algorithms=algorithm)
-        username: str = payload.get("sub")
+        username: str = decode_token(token)
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
@@ -69,3 +69,8 @@ async def get_current_user(token: str, db: Session, secret, algorithm):
     if user is None:
         raise credentials_exception
     return user
+
+
+def decode_token(token: str, secret=SECRET_KEY, algorithm=ALGORITHM):
+    payload = jwt.decode(token=token, key=secret, algorithms=algorithm)
+    return payload.get("sub")
