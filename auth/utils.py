@@ -21,6 +21,7 @@ class TokenData(BaseModel):
 
 class Account(BaseModel):
     username: str
+    id: int
     
     class Config:
         orm_mode = True

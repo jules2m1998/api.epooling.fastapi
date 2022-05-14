@@ -26,7 +26,6 @@ def create_person_method(p: PersonSchema):
 def setter_person_method(p: Person, subperson: PersonSchema):
     p.first_name = subperson.first_name
     p.last_name = subperson.last_name
-    p.user_id = subperson.phone_ex
     p.sex = subperson.sex
 
     return p

@@ -9,14 +9,12 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
 @app.get('/')
 def redirect():
     return RedirectResponse("/docs")
 
+
 # app.include_router(router, prefix="/book", tags=["book"])
 app.include_router(user_router, prefix="/user", tags=["user"])
 app.include_router(auth_router, prefix="/auth", tags=["Account"])
-
-
-
-

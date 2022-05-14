@@ -1,8 +1,7 @@
-from pprint import pprint
-from .schemas import UserPersonSchema, UserSocietySchema
+from user.schemas import UserPersonSchema, UserSocietySchema
 from sqlalchemy.orm import Session
-from .utils import create_user_method
-from .models import Person, Society
+from user.utils import create_user_method
+from user.models import Person, Society
 from exception import bad_request
 
 
@@ -29,7 +28,6 @@ class Controller:
             db.rollback()
             raise bad_request
         return _u
-    
 
     @staticmethod
     def create_user_society(u: UserSocietySchema, db: Session):

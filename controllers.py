@@ -1,10 +1,9 @@
 from typing import Generic, List, TypeVar
-from unittest.mock import call
 from config import Base
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel
-from exception import not_found_404
-
+from exception import not_found_404, bad_request
 
 T = TypeVar('T', bound=Base)
 TS = TypeVar('TS', bound=BaseModel)
@@ -17,9 +16,12 @@ class Controllers(Generic[T, TS]):
 
     def create(self, db: Session, item: TS, method: callable) -> T:
         _item = method(item)
-        db.add(_item)
-        db.commit()
-        db.refresh(_item)
+        try:
+            db.add(_item)
+            db.commit()
+            db.refresh(_item)
+        except IntegrityError as ie:
+            raise bad_request
         return _item
 
     def get(self, db: Session, skip: int = 0, limit: int = 100) -> List[T]:
@@ -28,22 +30,21 @@ class Controllers(Generic[T, TS]):
         except Exception as es:
             print(es)
             raise es
-    
-    def retrieve(self,db: Session, id: int = 0,) -> T:
+
+    def retrieve(self, db: Session, id: int = 0, ) -> T:
         _item = db.query(self.cls).filter(self.cls.id == id).first()
         if _item:
             return _item
         else:
             raise not_found_404
-    
-    
-    def retrieveUsername(self,db: Session, username: str = 0,) -> T:
+
+    def retrieve_username(self, db: Session, username: str = 0, ) -> T:
         _item = db.query(self.cls).filter(self.cls.username == username).first()
         if _item:
             return _item
         else:
             raise not_found_404
-    
+
     def update(self, db: Session, id: int, item: TS, method: callable) -> TS:
         _item = self.retrieve(db=db, id=id)
         if _item:

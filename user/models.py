@@ -1,11 +1,11 @@
-from turtle import backward
-from sqlalchemy import  Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
 from config import Base
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
+
 class User(Base):
-    __tablename__ ="user"
+    __tablename__ = "user"
     id = Column(Integer, primary_key=True, index=True)
     phone = Column(Integer, nullable=False, unique=True)
     phone_ex = Column(String, nullable=False)
@@ -15,9 +15,9 @@ class User(Base):
     updated_at = Column(DateTime, onupdate=func.now())
 
     account_id = Column(Integer, ForeignKey('account.id'))
-    
-    person = relationship("Person", back_populates = 'user', uselist=False, cascade="all, delete-orphan", lazy='joined')
-    society = relationship("Society", back_populates = 'user', uselist=False, cascade="all, delete-orphan", lazy='joined')
+
+    person = relationship("Person", back_populates='user', uselist=False, cascade="all, delete-orphan", lazy='joined')
+    society = relationship("Society", back_populates='user', uselist=False, cascade="all, delete-orphan", lazy='joined')
     account = relationship("Account")
 
     def __repr__(self):
@@ -25,24 +25,25 @@ class User(Base):
 
 
 class Person(Base):
-    __tablename__ ="person"
+    __tablename__ = "person"
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    sex = Column(Integer, nullable = False)
+    sex = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", back_populates = 'person', uselist=False)
+    user = relationship("User", back_populates='person', uselist=False)
 
     def __repr__(self):
         return "<Person %r>" % self.id
 
+
 class Society(Base):
-    __tablename__ ="society"
+    __tablename__ = "society"
     id = Column(Integer, primary_key=True, index=True)
-    desc = Column(String, nullable = False)
-    location = Column(String, nullable = False)
+    desc = Column(String, nullable=False)
+    location = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", back_populates = 'society', uselist=False)
+    user = relationship("User", back_populates='society', uselist=False)
 
     def __repr__(self):
         return "<Society %r>" % self.id

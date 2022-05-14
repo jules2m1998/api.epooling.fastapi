@@ -1,13 +1,12 @@
-from typing import Any
-from sqlalchemy import  Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
 from config import Base
 
+
 class Account(Base):
-    __tablename__ ="account"
+    __tablename__ = "account"
     id = Column(Integer, primary_key=True, index=True)
-    username: str = Column(String, nullable=False)
+    username: str = Column(String, nullable=False, unique=True)
     hashed_password: str = Column(String, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, onupdate=func.now())
