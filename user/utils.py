@@ -1,8 +1,6 @@
-
-from sqlalchemy import desc
 from config import SessionLocal
-from .schemas import PersonSchema, SocietySchema, UserSchema
-from .models import Person, Society, User
+from user.schemas import PersonSchema, SocietySchema, UserSchema
+from user.models import Person, Society, User
 
 
 def get_db():
@@ -15,9 +13,9 @@ def get_db():
 
 def create_person_method(p: PersonSchema):
     _p = Person(
-        first_name=p.first_name, 
-        last_name=p.last_name, 
-        sex=p.sex, 
+        first_name=p.first_name,
+        last_name=p.last_name,
+        sex=p.sex,
         user_id=p.user_id
     )
     return _p
@@ -33,11 +31,11 @@ def setter_person_method(p: Person, subperson: PersonSchema):
 
 def create_user_method(u: UserSchema):
     _u = User(
-        phone = u.phone,
-        phone_ex = u.phone_ex,
-        avatar_url = u.avatar_url,
-        email = u.email,
-        account_id = u.account_id
+        phone=u.phone,
+        phone_ex=u.phone_ex,
+        avatar_url=u.avatar_url,
+        email=u.email,
+        account_id=u.account_id
     )
     return _u
 
@@ -53,12 +51,13 @@ def setter_user_method(_u: User, u: UserSchema):
 
 def create_society_method(s: SocietySchema):
     _s = Society(
-        desc= s.desc,
-        location= s.location,
-        user_id = s.user_iduser_id
+        desc=s.desc,
+        location=s.location,
+        user_id=s.user_iduser_id
     )
 
     return _s
+
 
 def setter_society_method(_s: Society, s: SocietySchema):
     _s.desc = s.desc
