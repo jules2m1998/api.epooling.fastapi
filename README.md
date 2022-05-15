@@ -41,5 +41,9 @@ docker-compose build
 docker-compose up
 ```
 
+## Enjoy
+api docs [localhost:8000/](http://localhost:8000)  \
+pgadmin [localhost:5050/](http://localhost:5050)
+
 # Customize configuration
 See [Configuration Reference](https://fastapi.tiangolo.com/).
