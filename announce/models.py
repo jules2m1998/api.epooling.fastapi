@@ -14,6 +14,12 @@ class Announce(BaseModel, Base):
     user_id = Column(Integer, ForeignKey('user.id'))
 
     user = relationship('User', uselist=False, lazy='joined', single_parent=True)
+    orders = relationship(
+        'Order',
+        back_populates='announce',
+        cascade="all,  delete-orphan, save-update",
+        lazy='joined'
+    )
     itinerary = relationship(
         'Itinerary',
         back_populates='announce',

@@ -5,6 +5,7 @@ from user.models import Base
 from auth.routes import router as auth_router
 from announce.routes import router as announce_router, cityRouter as city_router
 from itinerary.routes import router as itinerary_router
+from order.routes import router as order_router
 from fastapi.responses import RedirectResponse
 from itinerary.models import ItineraryCity
 
@@ -24,3 +25,4 @@ app.include_router(auth_router, prefix="/auth", tags=["Account"])
 app.include_router(announce_router, prefix="/announce", tags=["Announce"])
 app.include_router(city_router, prefix="/city", tags=["City"])
 app.include_router(itinerary_router, prefix="/itinerary", tags=["Itinerary"])
+app.include_router(order_router, prefix="/order", tags=["Order"])
