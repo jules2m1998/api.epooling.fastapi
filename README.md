@@ -10,6 +10,12 @@ DB_NAME=
 PGADMIN_EMAIL=
 PGADMIN_PASSWORD=
 POSTGRES_PASSWORD=
+
+ # to jwt token auth
+
+SECRET_KEY =
+ALGORITHM = 
+ACCESS_TOKEN_EXPIRE_MINUTES = 
 ```
 ## Simple installation
 ### Virtual env
