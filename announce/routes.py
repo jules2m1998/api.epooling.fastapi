@@ -4,6 +4,7 @@ from announce.schemas import AnnounceSchema, CitySchema, AnnounceInSchema, CityI
 from sqlalchemy.orm import Session
 from typing import List
 from utils import get_db
+from auth.auth_bearer import JWTBearer
 
 
 router = APIRouter()
@@ -34,7 +35,11 @@ def create_announce(announce: AnnounceInSchema, db: Session = Depends(get_db)):
     return AnnounceController.create(db, announce)
 
 
-@router.put("/", response_model=AnnounceSchema)
+@router.put(
+    "/",
+    response_model=AnnounceSchema,
+    dependencies=[Depends(JWTBearer())]
+)
 def update_announce(announce: AnnounceUpdateSchema, db: Session = Depends(get_db)):
     """
     Update an announce
@@ -42,8 +47,12 @@ def update_announce(announce: AnnounceUpdateSchema, db: Session = Depends(get_db
     return AnnounceController.update(db, announce)
 
 
-@router.delete("/{id}", response_model=AnnounceSchema)
-def delete_announce(id: int, db: Session = Depends(get_db)):
+@router.delete(
+    "/{id}/{user_id}",
+    response_model=AnnounceSchema,
+    dependencies=[Depends(JWTBearer())]
+)
+def delete_announce(id: int, user_id: str, db: Session = Depends(get_db)):
     """
     Delete an announce
     """

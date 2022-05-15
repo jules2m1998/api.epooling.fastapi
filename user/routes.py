@@ -9,7 +9,6 @@ from user.utils import create_person_method, setter_person_method, setter_user_m
     setter_society_method
 from utils import get_db
 from auth.auth_bearer import JWTBearer
-from config import SessionLocal
 
 # Const declaration
 
@@ -52,13 +51,13 @@ async def get_user(id: int, db: Session = Depends(get_db)):
 
 
 @router.delete(
-    '/{id}',
+    '/{user_id}',
     status_code=status.HTTP_200_OK,
     response_model=UserSchema,
-    dependencies=[Depends(JWTBearer(db=SessionLocal()))]
+    dependencies=[Depends(JWTBearer())]
 )
-async def delete_user(id: int, db: Session = Depends(get_db)):
-    return user_controller.delete(db=db, id=id)
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    return user_controller.delete(db=db, id=user_id)
 
 
 ## -------------------------------------------------------
@@ -103,7 +102,7 @@ async def get_person(id: int, db: Session = Depends(get_db)):
 @router.put(
     '/person',
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(JWTBearer(is_user_id=True, db=SessionLocal()))]
+    dependencies=[Depends(JWTBearer())]
 )
 async def update_person(request: PersonSchema, db: Session = Depends(get_db)):
     return controller.update(db, id=request.id, item=request, method=setter_person_method)
@@ -140,7 +139,7 @@ async def get_society(id: int, db: Session = Depends(get_db)):
     '/society',
     status_code=status.HTTP_200_OK,
     response_model=SocietySchema,
-    dependencies=[Depends(JWTBearer(is_user_id=True, db=SessionLocal()))]
+    dependencies=[Depends(JWTBearer())]
 )
 async def update_society(request: SocietySchema, db: Session = Depends(get_db)):
     return society_controller.update(db=db, id=request.id, item=request, method=setter_society_method)

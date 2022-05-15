@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from itinerary.models import Itinerary
+from auth.auth_bearer import JWTBearer
 from announce.schemas import ItinerarySchema, ItineraryInSchema
 from itinerary.controller import ItineraryController
 from sqlalchemy.orm import Session
@@ -42,7 +42,11 @@ async def create_itinerary(
     return ItineraryController.create(db, itinerary)
 
 
-@router.put("/{id}", response_model=ItinerarySchema)
+@router.put(
+    "/{id}",
+    response_model=ItinerarySchema,
+    dependencies=[Depends(JWTBearer())]
+)
 async def update_itinerary(
     id: int,
     itinerary: ItinerarySchema,
@@ -54,7 +58,11 @@ async def update_itinerary(
     return ItineraryController.update(db, id, itinerary)
 
 
-@router.delete("/{id}", response_model=ItinerarySchema)
+@router.delete(
+    "/{id}",
+    response_model=ItinerarySchema,
+    dependencies=[Depends(JWTBearer())]
+)
 async def delete_itinerary(
     id: int,
     db: Session = Depends(get_db)
