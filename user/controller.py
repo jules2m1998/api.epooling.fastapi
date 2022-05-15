@@ -1,8 +1,9 @@
 from user.schemas import UserPersonSchema, UserSocietySchema
 from sqlalchemy.orm import Session
 from user.utils import create_user_method
-from user.models import Person, Society
+from user.models import Person, Society, User
 from exception import bad_request
+from auth.models import Account
 
 
 class Controller:
@@ -11,9 +12,9 @@ class Controller:
     def create_user_person(u: UserPersonSchema, db: Session):
         _u = create_user_method(u)
         _p = Person(
-            first_name= u.first_name, 
-            last_name=  u.last_name, 
-            sex=  u.sex
+            first_name=u.first_name,
+            last_name=u.last_name,
+            sex=u.sex
         )
 
         try:
@@ -33,8 +34,8 @@ class Controller:
     def create_user_society(u: UserSocietySchema, db: Session):
         _u = create_user_method(u=u)
         _s = Society(
-            desc = u.desc,
-            location = u.location
+            desc=u.desc,
+            location=u.location
         )
 
         try:
@@ -50,3 +51,12 @@ class Controller:
             db.rollback()
             raise bad_request
         return _u
+
+    @staticmethod
+    def get_by_username(username: str, db: Session):
+        return db.query(User).join(Account).filter(Account.username == username).first()
+
+    @staticmethod
+    def get_by_id(id: int, db: Session):
+        print(db)
+        return db.query(User).join(Account).filter(User.id == id).first()

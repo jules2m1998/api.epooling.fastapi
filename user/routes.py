@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, Response, status, Header
+from fastapi import APIRouter, Depends, status
 from controllers import Controllers
 from user.controller import Controller as UserPersonController
 from user.schemas import PersonSchema, SocietySchema, UserSchema, UserPersonSchema, UserSocietySchema
@@ -8,12 +8,13 @@ from sqlalchemy.orm import Session
 from user.utils import create_person_method, get_db, setter_person_method, setter_user_method, create_society_method, \
     setter_society_method
 from auth.auth_bearer import JWTBearer
+from config import SessionLocal
 
 # Const declaration
 
 router = APIRouter()
 controller = Controllers[Person, PersonSchema](Person)
-user_conttroller = Controllers[User, UserSchema](User)
+user_controller = Controllers[User, UserSchema](User)
 society_controller = Controllers[Society, SocietySchema](Society)
 
 
@@ -24,8 +25,7 @@ society_controller = Controllers[Society, SocietySchema](Society)
 
 # @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserSchema)
 # async def create_user(request: UserSimpleSchema, db: Session = Depends(get_db)):
-#     return user_conttroller.create(db=db, item=request, method=create_user_method)
-
+#     return user_controller.create(db=db, item=request, method=create_user_method)
 
 @router.put(
     '/',
@@ -37,22 +37,27 @@ async def update_user(
         request: UserSchema,
         db: Session = Depends(get_db)
 ):
-    return user_conttroller.update(db=db, id=request.id, item=request, method=setter_user_method)
+    return user_controller.update(db=db, id=request.id, item=request, method=setter_user_method)
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=List[UserSchema])
 async def get_users(db: Session = Depends(get_db)):
-    return user_conttroller.get(db=db)
+    return user_controller.get(db=db)
 
 
 @router.get('/one/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def get_user(id: int, db: Session = Depends(get_db)):
-    return user_conttroller.retrieve(db=db, id=id)
+    return user_controller.retrieve(db=db, id=id)
 
 
-@router.delete('/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
+@router.delete(
+    '/{id}',
+    status_code=status.HTTP_200_OK,
+    response_model=UserSchema,
+    dependencies=[Depends(JWTBearer(db=SessionLocal()))]
+)
 async def delete_user(id: int, db: Session = Depends(get_db)):
-    return user_conttroller.delete(db=db, id=id)
+    return user_controller.delete(db=db, id=id)
 
 
 ## -------------------------------------------------------
@@ -94,7 +99,11 @@ async def get_person(id: int, db: Session = Depends(get_db)):
 
 
 # update person api
-@router.put('/person', status_code=status.HTTP_200_OK)
+@router.put(
+    '/person',
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(JWTBearer(is_user_id=True, db=SessionLocal()))]
+)
 async def update_person(request: PersonSchema, db: Session = Depends(get_db)):
     return controller.update(db, id=request.id, item=request, method=setter_person_method)
 
@@ -126,7 +135,12 @@ async def get_society(id: int, db: Session = Depends(get_db)):
     return society_controller.retrieve(db=db, id=id)
 
 
-@router.put('/society', status_code=status.HTTP_200_OK, response_model=SocietySchema)
+@router.put(
+    '/society',
+    status_code=status.HTTP_200_OK,
+    response_model=SocietySchema,
+    dependencies=[Depends(JWTBearer(is_user_id=True, db=SessionLocal()))]
+)
 async def update_society(request: SocietySchema, db: Session = Depends(get_db)):
     return society_controller.update(db=db, id=request.id, item=request, method=setter_society_method)
 

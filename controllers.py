@@ -14,7 +14,8 @@ class Controllers(Generic[T, TS]):
     def __init__(self, cls: T) -> None:
         self.cls = cls
 
-    def create(self, db: Session, item: TS, method: callable) -> T:
+    @staticmethod
+    def create(db: Session, item: TS, method: callable) -> T:
         _item = method(item)
         try:
             db.add(_item)
@@ -57,6 +58,7 @@ class Controllers(Generic[T, TS]):
 
     def delete(self, db: Session, id: int = 0) -> T:
         _item = self.retrieve(db=db, id=id)
+        print(_item)
         if _item:
             db.delete(_item)
             db.commit()
