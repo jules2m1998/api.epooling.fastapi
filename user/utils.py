@@ -1,14 +1,5 @@
-from config import SessionLocal
 from user.schemas import PersonSchema, SocietySchema, UserSchema
 from user.models import Person, Society, User
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def create_person_method(p: PersonSchema):

@@ -5,8 +5,9 @@ from user.controller import Controller as UserPersonController
 from user.schemas import PersonSchema, SocietySchema, UserSchema, UserPersonSchema, UserSocietySchema
 from user.models import Person, Society, User
 from sqlalchemy.orm import Session
-from user.utils import create_person_method, get_db, setter_person_method, setter_user_method, create_society_method, \
+from user.utils import create_person_method, setter_person_method, setter_user_method, create_society_method, \
     setter_society_method
+from utils import get_db
 from auth.auth_bearer import JWTBearer
 from config import SessionLocal
 

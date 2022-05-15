@@ -32,6 +32,8 @@ class Person(Base):
     sex = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User", back_populates='person', uselist=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
 
     def __repr__(self):
         return "<Person %r>" % self.id
@@ -44,6 +46,8 @@ class Society(Base):
     location = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User", back_populates='society', uselist=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, onupdate=func.now())
 
     def __repr__(self):
         return "<Society %r>" % self.id
