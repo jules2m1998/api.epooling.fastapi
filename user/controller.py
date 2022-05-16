@@ -4,6 +4,8 @@ from user.utils import create_user_method
 from user.models import Person, Society, User
 from exception import bad_request
 from auth.models import Account
+from exception import not_found_404, credentials_exception
+from auth.utils import decode_token
 
 
 class Controller:
@@ -25,9 +27,9 @@ class Controller:
             db.commit()
             db.refresh(_u)
             db.refresh(_p)
-        except:
+        except Exception as es:
             db.rollback()
-            raise bad_request
+            raise es
         return _u
 
     @staticmethod
@@ -54,9 +56,21 @@ class Controller:
 
     @staticmethod
     def get_by_username(username: str, db: Session):
-        return db.query(User).join(Account).filter(Account.username == username).first()
+        _u = db.query(User).join(Account).filter(Account.username == username).first()
+        if _u is not None:
+            return _u
+        raise not_found_404
 
     @staticmethod
     def get_by_id(id: int, db: Session):
         print(db)
         return db.query(User).join(Account).filter(User.id == id).first()
+
+    @staticmethod
+    def get_user_by_token(token: str, db: Session):
+        print(token)
+        try:
+            username = decode_token(token)
+            return Controller.get_by_username(username, db)
+        except:
+            raise credentials_exception

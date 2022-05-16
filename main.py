@@ -7,11 +7,25 @@ from announce.routes import router as announce_router, cityRouter as city_router
 from itinerary.routes import router as itinerary_router
 from order.routes import router as order_router
 from fastapi.responses import RedirectResponse
-from itinerary.models import ItineraryCity
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+origins = [
+    "*"
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get('/')

@@ -9,6 +9,7 @@ from user.utils import create_person_method, setter_person_method, setter_user_m
     setter_society_method
 from utils import get_db
 from auth.auth_bearer import JWTBearer
+from auth.utils import oauth2_scheme
 
 # Const declaration
 
@@ -48,6 +49,11 @@ async def get_users(db: Session = Depends(get_db)):
 @router.get('/one/{id}', status_code=status.HTTP_200_OK, response_model=UserSchema)
 async def get_user(id: int, db: Session = Depends(get_db)):
     return user_controller.retrieve(db=db, id=id)
+
+
+@router.get('/account_token', status_code=status.HTTP_200_OK, response_model=UserSchema)
+async def get_user_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    return UserPersonController.get_user_by_token(token, db)
 
 
 @router.delete(
