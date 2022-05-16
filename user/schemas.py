@@ -22,6 +22,7 @@ class PersonSchema(Tmp):
 
 
 class SocietySchema(Tmp):
+    name: str
     desc: str
     location: str
     user_id: int = Field(default=None, foreign_key="user.id")
@@ -65,6 +66,7 @@ class UserPersonSchema(BaseModel):
 class UserSocietySchema(BaseModel):
     desc: str
     location: str
+    name: str
     phone: int
     phone_ex: str
     avatar_url: str

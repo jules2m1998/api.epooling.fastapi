@@ -34,10 +34,12 @@ class Controller:
 
     @staticmethod
     def create_user_society(u: UserSocietySchema, db: Session):
+        print(u.name)
         _u = create_user_method(u=u)
         _s = Society(
             desc=u.desc,
-            location=u.location
+            location=u.location,
+            name=u.name
         )
 
         try:
@@ -49,9 +51,8 @@ class Controller:
             db.refresh(_u)
             db.refresh(_s)
         except Exception as es:
-            print(es)
             db.rollback()
-            raise bad_request
+            raise es
         return _u
 
     @staticmethod

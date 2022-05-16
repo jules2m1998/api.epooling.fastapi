@@ -44,6 +44,7 @@ class Society(Base):
     id = Column(Integer, primary_key=True, index=True)
     desc = Column(String, nullable=False)
     location = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship("User", back_populates='society', uselist=False)
     created_at = Column(DateTime, server_default=func.now())
