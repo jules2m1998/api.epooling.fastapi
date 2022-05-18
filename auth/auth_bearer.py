@@ -1,11 +1,12 @@
 from fastapi import Request, HTTPException
+from auth.Controller import Controller
+from user.controller import Controller as UserController
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
 from conf import ALGORITHM, SECRET_KEY
-from auth.utils import Account
 from user.models import User
+from auth.models import Account
 from auth.utils import decode_token
-from user.controller import Controller
 from config import SessionLocal
 
 
@@ -30,21 +31,21 @@ class JWTBearer(HTTPBearer):
                 raise HTTPException(status_code=403, detail="Invalid token or expired token.")
 
             username = decode_token(credentials.credentials)
+            form = await request.form()
             if request.method != 'DELETE':
-                body = await request.json()
+                if form:
+                    body = {'user_id': dict(form)['user_id']}
+                else:
+                    body = await request.json()
             else:
                 body = {'user_id': request.path_params['user_id']}
-            if body.get('account') is not None:
-                account: Account = Account(username=body['account']['username'])
-                if account.username != username:
-                    raise HTTPException(status_code=403, detail="Invalid authorization code.")
-                return credentials.credentials
-            elif body['user_id'] is not None:
+            if body['user_id'] is not None:
                 try:
                     user_id: int = body['user_id']
-                    user: User = Controller.get_by_username(db=self.db, username=username)
-                    if user is not None:
-                        if user.id != int(user_id):
+                    account: Account = Controller.get_username(db=self.db, username=username)
+                    if account is not None:
+                        user: User = UserController.get_by_id(db=self.db, id=user_id)
+                        if user.account.id != account.id:
                             raise HTTPException(status_code=403, detail="Invalid authorization code.")
                         return credentials.credentials
                     else:

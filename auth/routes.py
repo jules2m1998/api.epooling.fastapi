@@ -64,4 +64,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 @router.get("/me", status_code=status.HTTP_200_OK, response_model=AccountSchema)
 async def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    return await get_current_user(token, db=db, secret=SECRET_KEY, algorithm=ALGORITHM)
+    return await get_current_user(token, db=db)

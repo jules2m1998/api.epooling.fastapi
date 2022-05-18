@@ -1,6 +1,7 @@
 from typing import Any, Optional
 from pydantic import BaseModel, Field
 from auth.utils import Account
+from fastapi import UploadFile
 
 
 class Tmp(BaseModel):
@@ -21,6 +22,12 @@ class PersonSchema(Tmp):
         orm_mode = True
 
 
+class PersonInSchema(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    sex: Optional[int] = None
+
+
 class SocietySchema(Tmp):
     name: str
     desc: str
@@ -31,11 +38,17 @@ class SocietySchema(Tmp):
         orm_mode = True
 
 
+class SocietyInSchema(BaseModel):
+    name: Optional[str] = None
+    desc: Optional[str] = None
+    location: Optional[str] = None
+
+
 class UserSimpleSchema(BaseModel):
     id: int
     phone: int
     phone_ex: str
-    avatar_url: str
+    avatar_url: Optional[str]
     email: str
     account_id: int
 
@@ -47,6 +60,13 @@ class UserSchema(UserSimpleSchema):
     account: Optional[Account]
     person: Optional[PersonSchema]
     society: Optional[SocietySchema]
+
+
+class UserInSchema(BaseModel):
+    phone: Optional[int] = None
+    phone_ex: Optional[str] = None
+    avatar: Optional[UploadFile] = None
+    email: Optional[str] = None
 
 
 class UserPersonSchema(BaseModel):

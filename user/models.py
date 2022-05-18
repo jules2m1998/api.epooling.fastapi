@@ -16,8 +16,8 @@ class User(Base):
 
     account_id = Column(Integer, ForeignKey('account.id'))
 
-    person = relationship("Person", back_populates='user', uselist=False, cascade="all, delete-orphan", lazy='joined')
-    society = relationship("Society", back_populates='user', uselist=False, cascade="all, delete-orphan", lazy='joined')
+    person = relationship("Person", back_populates='user', uselist=False, cascade="all, delete", lazy='joined')
+    society = relationship("Society", back_populates='user', uselist=False, cascade="all, delete", lazy='joined')
     account = relationship("Account")
 
     def __repr__(self):

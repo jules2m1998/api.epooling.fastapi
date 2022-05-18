@@ -15,6 +15,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 controller = Controllers(AccountModel)
 
+accepted_file_extensions = ['png', 'jpg', 'jpeg']
+
 
 class Token(BaseModel):
     access_token: str
