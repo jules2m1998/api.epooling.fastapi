@@ -6,8 +6,7 @@ from user.schemas import PersonSchema, SocietySchema, UserSchema, UserPersonSche
     SocietyInSchema, PersonInSchema
 from user.models import Person, Society, User
 from sqlalchemy.orm import Session
-from user.utils import create_person_method, setter_person_method, setter_user_method, create_society_method, \
-    setter_society_method
+from user.utils import create_person_method, create_society_method
 from utils import get_db, get_update_value
 from auth.auth_bearer import JWTBearer
 from auth.utils import oauth2_scheme, accepted_file_extensions

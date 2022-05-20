@@ -1,17 +1,19 @@
 from user.schemas import UserPersonSchema, UserSocietySchema, UserSchema, UserInSchema, SocietyInSchema, PersonInSchema
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from user.utils import create_user_method
 from user.models import Person, Society, User
 from auth.models import Account
 from exception import not_found_404, credentials_exception
 from auth.utils import decode_token
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException, status
 from typing import Union
 import uuid
 import os
 from os.path import join, exists
 from pathlib import Path
 from utils import copy_value
+from exception import bad_request
 
 
 class Controller:
@@ -32,6 +34,13 @@ class Controller:
         return _i
 
     @staticmethod
+    def phone_number_exist(phone: int, db: Session):
+        user_phone: User = db.query(User).filter(User.phone == phone).first()
+        if user_phone is not None:
+            return True
+        return False
+
+    @staticmethod
     def create_file(old_file_name: Union[str, None] = None, file_location: Union[str, int] = '', file: UploadFile = ''):
         if old_file_name is not None:
             file_path = join(Path(__file__).parent.parent.absolute(), old_file_name)
@@ -44,22 +53,33 @@ class Controller:
 
     @staticmethod
     def create_user_person(u: UserPersonSchema, db: Session, avatar: UploadFile = None):
-        if avatar is not None:
-            file_location = Controller.create_file(
-                file_location=u.account_id,
-                file=avatar
-            )
-        else:
-            file_location = None
+        if not Controller.phone_number_exist(u.phone, db):
+            if avatar is not None:
+                file_location = Controller.create_file(
+                    file_location=u.account_id,
+                    file=avatar
+                )
+            else:
+                file_location = None
 
-        u.avatar_url = file_location
-        _u = create_user_method(u=UserSchema(**u.dict(), id=0))
-        _p = Person(
-            first_name=u.first_name,
-            last_name=u.last_name,
-            sex=u.sex
-        )
-        return Controller.save(db, _u, _p)
+            u.avatar_url = file_location
+            _u = create_user_method(u=UserSchema(**u.dict(), id=0))
+            _p = Person(
+                first_name=u.first_name,
+                last_name=u.last_name,
+                sex=u.sex
+            )
+            return Controller.save(db, _u, _p)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[
+                    {
+                        'message': 'Le numeros de telephone est deja utilise',
+                        'field': 'phone'
+                    }
+                ]
+            )
 
     @staticmethod
     def create_user_society(u: UserSocietySchema, db: Session, avatar: UploadFile = None):
@@ -121,13 +141,25 @@ class Controller:
     @staticmethod
     def update_user(id: int, u: UserInSchema, db: Session):
         _u: User = Controller.get_by_id(id, db)
-        if _u.avatar_url and u.avatar:
-            _u.avatar_url = Controller.create_file(old_file_name=_u.avatar_url, file_location=str(_u.id), file=u.avatar)
-        elif u.avatar:
-            _u.avatar_url = Controller.create_file(old_file_name=None, file_location=str(_u.id), file=u.avatar)
-        copy_value(_u, u, ['avatar'])
-        db.commit()
-        return _u
+        if not Controller.phone_number_exist(u.phone, db):
+            if _u.avatar_url and u.avatar:
+                _u.avatar_url = Controller.create_file(old_file_name=_u.avatar_url, file_location=str(_u.id),
+                                                       file=u.avatar)
+            elif u.avatar:
+                _u.avatar_url = Controller.create_file(old_file_name=None, file_location=str(_u.id), file=u.avatar)
+            copy_value(_u, u, ['avatar'])
+            db.flush()
+            return _u
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[
+                    {
+                        'message': 'Le numeros de telephone est deja utilise',
+                        'field': 'phone'
+                    }
+                ]
+            )
 
     @staticmethod
     def update_user_society(id: int, s: SocietyInSchema, db: Session):
@@ -142,5 +174,3 @@ class Controller:
         copy_value(_p, p)
         db.commit()
         return _p
-
-

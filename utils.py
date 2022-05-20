@@ -38,8 +38,32 @@ def copy_value(
 ):
     if exclude is None:
         exclude = []
-    print(schema)
     for key, value in schema.dict().items():
         if value is not None:
             if key not in exclude:
                 setattr(model, key, value)
+
+
+fields_translate = {
+    "id": "L'identifiant",
+    "name": "Le nom",
+    "first_name": "Le prénom",
+    'last_name': 'Le Nom de famille',
+    "email": "L'email",
+    "password": "Le mot de passe",
+    "phone": "Le numéro de Téléphone",
+    "address": "L'adresse",
+    "postal_ex": "L'extension du numéro de téléphone",
+    "city": "La ville",
+    "country": "Le pays",
+    "birthday": "La date de naissance",
+    'desc': "La description",
+    'username': "Le nom d'utilisateur",
+    'price': "Le prix",
+    'type': "Le type",
+    'order': "l'ordre",
+    'is_accepted': "Accepté",
+    'sex': 'Le sexe'
+}
+
+
