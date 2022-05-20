@@ -1,10 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.sql import func
 from config import SessionLocal
-from fastapi import HTTPException, status
 from user.models import Person, Society, User
 from user.schemas import UserInSchema, SocietyInSchema, PersonInSchema
 from typing import Union
+from fastapi import UploadFile, HTTPException, status
+import uuid
+import os
+from os.path import join, exists
+from pathlib import Path
 
 
 class BaseModel:
@@ -44,6 +48,24 @@ def copy_value(
                 setattr(model, key, value)
 
 
+def create_file(old_file_name: Union[str, None] = None, file_location: Union[str, int] = '', file: UploadFile = '') -> str:
+    if old_file_name is not None:
+        file_path = join(Path(__file__).parent.parent.absolute(), old_file_name)
+        if exists(file_path):
+            os.remove(file_path)
+    file_location = f"static/{file_location}_{uuid.uuid4()}.{file.filename.split('.')[-1]}"
+    with open(file_location, "wb+") as file_object:
+        file_object.write(file.file.read())
+    return file_location
+
+
+def create_file_with_bytes(bytes_file: bytes, file_location: str = '', file_ext: str = '') -> str:
+    file_location = f"static/{file_location}_{uuid.uuid4()}.{file_ext}"
+    with open(file_location, "wb+") as file_object:
+        file_object.write(bytes_file)
+    return file_location
+
+
 fields_translate = {
     "id": "L'identifiant",
     "name": "Le nom",
@@ -65,5 +87,6 @@ fields_translate = {
     'is_accepted': "Accepté",
     'sex': 'Le sexe'
 }
+file_base64_regex = r'^data:image/[a-z]+;base64,'
 
 

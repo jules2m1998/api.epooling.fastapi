@@ -102,13 +102,40 @@ class ItineraryInSchema(BaseModel):
     end_date: str
     cities: List[ItineraryInCitySchema]
 
+###############################################################################
+
+
+class ItineraryCityInSchema(BaseModel):
+    id: int
+    price: int
+
+
+class ItineraryCitiesInSchema(BaseModel):
+    name: str
+    start_date: datetime.datetime
+    end_date: datetime.datetime
+    cities: List[ItineraryCityInSchema]
+
+###############################################################################
+
+
+class AnnounceItineraryInSchema(BaseModel):
+    description: str
+    image: str
+    volume: int
+    user_id: int
+    itinerary: ItineraryCitiesInSchema
+
+    class Config:
+        orm_mode = True
+
 
 class AnnounceInSchema(BaseModel):
     description: str
     image: str
     volume: int
     user_id: int
-    is_delivery: bool = False
+    itinerary: ItineraryInSchema
 
     class Config:
         orm_mode = True

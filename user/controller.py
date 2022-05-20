@@ -1,6 +1,5 @@
 from user.schemas import UserPersonSchema, UserSocietySchema, UserSchema, UserInSchema, SocietyInSchema, PersonInSchema
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from user.utils import create_user_method
 from user.models import Person, Society, User
 from auth.models import Account
@@ -8,12 +7,8 @@ from exception import not_found_404, credentials_exception
 from auth.utils import decode_token
 from fastapi import UploadFile, HTTPException, status
 from typing import Union
-import uuid
-import os
-from os.path import join, exists
-from pathlib import Path
 from utils import copy_value
-from exception import bad_request
+from utils import create_file
 
 
 class Controller:
@@ -41,21 +36,10 @@ class Controller:
         return False
 
     @staticmethod
-    def create_file(old_file_name: Union[str, None] = None, file_location: Union[str, int] = '', file: UploadFile = ''):
-        if old_file_name is not None:
-            file_path = join(Path(__file__).parent.parent.absolute(), old_file_name)
-            if exists(file_path):
-                os.remove(file_path)
-        file_location = f"static/{file_location}_{uuid.uuid4()}.{file.filename.split('.')[-1]}"
-        with open(file_location, "wb+") as file_object:
-            file_object.write(file.file.read())
-        return file_location
-
-    @staticmethod
     def create_user_person(u: UserPersonSchema, db: Session, avatar: UploadFile = None):
         if not Controller.phone_number_exist(u.phone, db):
             if avatar is not None:
-                file_location = Controller.create_file(
+                file_location = create_file(
                     file_location=u.account_id,
                     file=avatar
                 )
@@ -84,7 +68,7 @@ class Controller:
     @staticmethod
     def create_user_society(u: UserSocietySchema, db: Session, avatar: UploadFile = None):
         if avatar is not None:
-            file_location = Controller.create_file(
+            file_location = create_file(
                 file_location=u.account_id,
                 file=avatar
             )
@@ -143,10 +127,10 @@ class Controller:
         _u: User = Controller.get_by_id(id, db)
         if not Controller.phone_number_exist(u.phone, db):
             if _u.avatar_url and u.avatar:
-                _u.avatar_url = Controller.create_file(old_file_name=_u.avatar_url, file_location=str(_u.id),
+                _u.avatar_url = create_file(old_file_name=_u.avatar_url, file_location=str(_u.id),
                                                        file=u.avatar)
             elif u.avatar:
-                _u.avatar_url = Controller.create_file(old_file_name=None, file_location=str(_u.id), file=u.avatar)
+                _u.avatar_url = create_file(old_file_name=None, file_location=str(_u.id), file=u.avatar)
             copy_value(_u, u, ['avatar'])
             db.flush()
             return _u

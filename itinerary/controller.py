@@ -22,6 +22,15 @@ class ItineraryController:
         return _i
 
     @staticmethod
+    def create_city(db: Session, id: int, city: ItineraryInCitySchema):
+        _i = ItineraryController.get_by_id(db, id)
+        city.itinerary_id = _i.id
+        _ic = ItineraryCityController.create(db, city)
+        db.add(_ic)
+        db.commit()
+        return _ic
+
+    @staticmethod
     def get_all(db: Session) -> List[ItinerarySchema]:
         return db.query(Itinerary).all()
 

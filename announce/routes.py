@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from announce.controller import AnnounceController, CityController
-from announce.schemas import AnnounceSchema, CitySchema, AnnounceInSchema, CityInSchema, AnnounceUpdateSchema
+from announce.schemas import AnnounceSchema, CitySchema, AnnounceInSchema, CityInSchema, AnnounceUpdateSchema, AnnounceItineraryInSchema
 from sqlalchemy.orm import Session
 from typing import List
 from utils import get_db
@@ -33,6 +33,14 @@ def create_announce(announce: AnnounceInSchema, db: Session = Depends(get_db)):
     Create a new announce
     """
     return AnnounceController.create(db, announce)
+
+
+@router.post("/itinerary", response_model=AnnounceSchema, status_code=status.HTTP_201_CREATED)
+def create_announce(announce: AnnounceItineraryInSchema, db: Session = Depends(get_db)):
+    """
+    Create a new announce with itinerary
+    """
+    return AnnounceController.create_with_itinerary(db, announce)
 
 
 @router.put(

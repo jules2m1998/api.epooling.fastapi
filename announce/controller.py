@@ -1,7 +1,12 @@
 from announce.models import Announce, City
-from announce.schemas import AnnounceUpdateSchema, CitySchema, AnnounceInSchema
+from itinerary.models import Itinerary, ItineraryCity
+from announce.schemas import AnnounceUpdateSchema, CitySchema, AnnounceInSchema, AnnounceItineraryInSchema
 from sqlalchemy.orm import Session
 from exception import not_found_404
+import base64
+from utils import create_file_with_bytes, file_base64_regex
+import re
+import imghdr
 
 
 class AnnounceController:
@@ -13,6 +18,49 @@ class AnnounceController:
         db.add(_announce)
         db.commit()
         db.refresh(_announce)
+        return _announce
+
+    @staticmethod
+    def create_with_itinerary(db: Session, announce: AnnounceItineraryInSchema) -> AnnounceInSchema:
+        image_data = base64.b64decode(re.sub(file_base64_regex, '', announce.image))
+        ext = imghdr.what('', image_data)
+
+        try:
+            _announce = Announce(
+                description=announce.description,
+                image=create_file_with_bytes(
+                    bytes_file=image_data,
+                    file_location=f'announce/{announce.user_id}',
+                    file_ext=ext
+                ),
+                volume=announce.volume,
+                user_id=announce.user_id
+            )
+            db.add(_announce)
+            db.flush()
+            _itinerary = Itinerary(
+                start_date=announce.itinerary.start_date,
+                end_date=announce.itinerary.end_date,
+                announce_id=_announce.id,
+                name=announce.itinerary.name
+            )
+            db.add(_itinerary)
+            db.flush()
+            print(announce.itinerary.cities)
+            _id = 0
+            for city in announce.itinerary.cities:
+                _city = ItineraryCity(
+                    city_id=city.id,
+                    itinerary_id=_itinerary.id,
+                    order=_id,
+                    price=city.price
+                )
+                db.add(_city)
+                _id += 1
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise e
         return _announce
 
     @staticmethod
@@ -63,4 +111,3 @@ class CityController:
         db.commit()
         db.refresh(_city)
         return _city
-
