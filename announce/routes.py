@@ -19,6 +19,14 @@ def get_announce(id: int, db: Session = Depends(get_db)):
     return AnnounceController.get_by_id(db, id)
 
 
+@router.get("/user/{user_id}", response_model=List[AnnounceSchema])
+def get_announce_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get the announce by id
+    """
+    return AnnounceController.get_all_by_user_id(db, user_id)
+
+
 @router.get("/", response_model=List[AnnounceSchema])
 def get_announces(db: Session = Depends(get_db)):
     """

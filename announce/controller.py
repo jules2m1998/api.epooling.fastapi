@@ -68,6 +68,15 @@ class AnnounceController:
         return db.query(Announce).all()
 
     @staticmethod
+    def get_all_by_user_id(db: Session, user_id: int):
+        print(user_id)
+        return db.query(
+            Announce
+        ).filter(
+            Announce.user_id == user_id
+        ).order_by(Announce.created_at.desc()).all()
+
+    @staticmethod
     def get_by_id(db: Session, id: int):
         _announce = db.query(Announce).filter(Announce.id == id).first()
         if _announce:

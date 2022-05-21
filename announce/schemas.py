@@ -26,6 +26,7 @@ class ItineraryCitySchema(BaseModel):
     itinerary_id: int
     price: int
     order: int
+    date: datetime.datetime
 
     class Config:
         orm_mode = True
@@ -108,6 +109,7 @@ class ItineraryInSchema(BaseModel):
 class ItineraryCityInSchema(BaseModel):
     id: int
     price: int
+    date: datetime.datetime
 
 
 class ItineraryCitiesInSchema(BaseModel):
