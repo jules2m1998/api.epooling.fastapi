@@ -74,6 +74,22 @@ class AnnounceSchema(BaseModel):
         orm_mode = True
 
 
+class AnnounceOutSchema(BaseModel):
+    id: int
+    description: str
+    image: str
+    volume: int
+    is_delivery: bool
+    user_id: int
+    user: Optional[UserSchema]
+    itinerary: Optional[ItinerarySchema]
+    orders: Optional[List[OrderSchema]]
+    created_at: datetime.datetime
+
+    class Config:
+        orm_mode = True
+
+
 class AnnounceSimpleSchema(BaseModel):
     description: str
     image: str
@@ -84,6 +100,15 @@ class AnnounceSimpleSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class AnnounceInOptionalSchema(BaseModel):
+    description: Optional[str] = None
+    image: Optional[str] = None
+    volume: Optional[int] = None
+    is_delivery: Optional[bool] = None
+    user_id: Optional[int] = None
+    itinerary_id: Optional[int] = None
 
 
 class ItineraryInCitySchema(BaseModel):
@@ -127,6 +152,17 @@ class AnnounceItineraryInSchema(BaseModel):
     volume: int
     user_id: int
     itinerary: ItineraryCitiesInSchema
+
+    class Config:
+        orm_mode = True
+
+
+class AnnounceItineraryInOptionalSchema(BaseModel):
+    description: Optional[str] = None
+    image: Optional[str] = None
+    volume: Optional[int] = None
+    user_id: Optional[int] = None
+    itinerary: Optional[ItineraryCitiesInSchema] = None
 
     class Config:
         orm_mode = True

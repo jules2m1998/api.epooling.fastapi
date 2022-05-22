@@ -1,12 +1,14 @@
 from announce.models import Announce, City
 from itinerary.models import Itinerary, ItineraryCity
-from announce.schemas import AnnounceUpdateSchema, CitySchema, AnnounceInSchema, AnnounceItineraryInSchema
+from announce.schemas import AnnounceUpdateSchema, CitySchema, AnnounceInSchema, \
+    AnnounceItineraryInSchema, AnnounceItineraryInOptionalSchema, AnnounceInOptionalSchema, ItineraryCitiesInSchema
 from sqlalchemy.orm import Session
 from exception import not_found_404
 import base64
-from utils import create_file_with_bytes, file_base64_regex
+from utils import create_file_with_bytes, file_base64_regex, copy_value
 import re
 import imghdr
+from datetime import datetime
 
 
 class AnnounceController:
@@ -19,6 +21,28 @@ class AnnounceController:
         db.commit()
         db.refresh(_announce)
         return _announce
+
+    @staticmethod
+    def create_itinerary_cities(db: Session, itinerary: ItineraryCitiesInSchema, announce_id: int):
+        _itinerary = Itinerary(
+            start_date=itinerary.start_date,
+            end_date=itinerary.end_date,
+            announce_id=announce_id,
+            name=itinerary.name
+        )
+        db.add(_itinerary)
+        db.flush()
+        _id = 0
+        for city in itinerary.cities:
+            _city = ItineraryCity(
+                city_id=city.id,
+                itinerary_id=_itinerary.id,
+                order=_id,
+                price=city.price,
+                date=city.date
+            )
+            db.add(_city)
+            _id += 1
 
     @staticmethod
     def create_with_itinerary(db: Session, announce: AnnounceItineraryInSchema) -> AnnounceInSchema:
@@ -46,14 +70,14 @@ class AnnounceController:
             )
             db.add(_itinerary)
             db.flush()
-            print(announce.itinerary.cities)
             _id = 0
             for city in announce.itinerary.cities:
                 _city = ItineraryCity(
                     city_id=city.id,
                     itinerary_id=_itinerary.id,
                     order=_id,
-                    price=city.price
+                    price=city.price,
+                    date=city.date
                 )
                 db.add(_city)
                 _id += 1
@@ -64,8 +88,28 @@ class AnnounceController:
         return _announce
 
     @staticmethod
-    def get_all(db: Session):
-        return db.query(Announce).all()
+    def get_all(db: Session, start: int, end: int) -> [Announce]:
+        if all(v is not None for v in [start, end]):
+            first_list = db.query(Announce).join(Itinerary).join(ItineraryCity).join(City).filter(City.id == start).all()
+            second_list = db.query(Announce).join(Itinerary).join(ItineraryCity).join(City).filter(City.id == end).all()
+            intersect: [Announce] = list(set(first_list) & set(second_list))
+            result = []
+            for it in intersect:
+                itinerary_city = it.itinerary.itinerary_city
+                start_it = end_it = None
+                for itc in itinerary_city:
+                    print(itc.date > datetime.now())
+                    if itc.city_id == start:
+                        print(itc.city_id, 'start')
+                        start_it = itc
+                    elif itc.city_id == end:
+                        print(itc.city_id, 'end')
+                        end_it = itc
+                if all(v is not None for v in [start_it, end_it]):
+                    if start_it.order < end_it.order and start_it.date > datetime.now():
+                        result.append(it)
+            return result
+        return db.query(Announce).order_by(Announce.created_at.desc()).all()
 
     @staticmethod
     def get_all_by_user_id(db: Session, user_id: int):
@@ -94,7 +138,24 @@ class AnnounceController:
         return _announce
 
     @staticmethod
+    def update_with_itinerary(db: Session, announce: AnnounceItineraryInOptionalSchema, _id: int):
+        _announce: Announce = AnnounceController.get_by_id(db, _id)
+        announce_schema = AnnounceInOptionalSchema(**announce.dict())
+        try:
+            copy_value(_announce, announce_schema)
+            if announce.itinerary:
+                it = db.query(Itinerary).filter(Itinerary.announce_id == _announce.id).first()
+                db.delete(it)
+                AnnounceController.create_itinerary_cities(db, announce.itinerary, _announce.id)
+            db.commit()
+            return _announce
+        except Exception as e:
+            db.rollback()
+            raise e
+
+    @staticmethod
     def delete(db: Session, id: int):
+        print(id)
         _announce = AnnounceController.get_by_id(db, id)
         db.delete(_announce)
         db.commit()

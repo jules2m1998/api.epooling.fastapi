@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.sql import func
-from config import SessionLocal
-from user.models import Person, Society, User
+from config import SessionLocal, Base
 from user.schemas import UserInSchema, SocietyInSchema, PersonInSchema
 from typing import Union
 from fastapi import UploadFile, HTTPException, status
@@ -9,6 +8,7 @@ import uuid
 import os
 from os.path import join, exists
 from pathlib import Path
+from pydantic import BaseModel as PBaseModel
 
 
 class BaseModel:
@@ -36,8 +36,8 @@ def get_update_value(value: dict) -> dict:
 
 
 def copy_value(
-        model: Union[Person, Society, User],
-        schema: Union[UserInSchema, SocietyInSchema, PersonInSchema],
+        model: Base,
+        schema: PBaseModel,
         exclude=None
 ):
     if exclude is None:

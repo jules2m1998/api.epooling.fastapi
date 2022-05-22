@@ -2,7 +2,6 @@ from utils import BaseModel
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from config import Base
-from sqlalchemy.sql import func
 
 
 class ItineraryCity(BaseModel, Base):
@@ -13,7 +12,7 @@ class ItineraryCity(BaseModel, Base):
     price = Column(Integer)
     order = Column(Integer)
     itinerary = relationship('Itinerary', back_populates='itinerary_city', uselist=False, single_parent=True)
-    date = Column(DateTime, default=func.now())
+    date = Column(DateTime, nullable=False)
     city = relationship('City')
 
 
@@ -36,7 +35,7 @@ class Itinerary(BaseModel, Base):
     itinerary_city = relationship(
         'ItineraryCity',
         back_populates='itinerary',
-        cascade="all,  delete-orphan, save-update",
+        cascade="all, delete-orphan, save-update",
     )
 
     def __repr__(self):

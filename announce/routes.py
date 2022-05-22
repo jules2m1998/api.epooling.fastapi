@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, status
 from announce.controller import AnnounceController, CityController
-from announce.schemas import AnnounceSchema, CitySchema, AnnounceInSchema, CityInSchema, AnnounceUpdateSchema, AnnounceItineraryInSchema
+from announce.schemas import AnnounceSchema, CitySchema, \
+    AnnounceInSchema, CityInSchema, AnnounceUpdateSchema, AnnounceItineraryInSchema, AnnounceItineraryInOptionalSchema, AnnounceOutSchema
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from utils import get_db
 from auth.auth_bearer import JWTBearer
 
@@ -11,7 +12,7 @@ router = APIRouter()
 cityRouter = APIRouter()
 
 
-@router.get("/{id}", response_model=AnnounceSchema)
+@router.get("/{id}", response_model=AnnounceOutSchema)
 def get_announce(id: int, db: Session = Depends(get_db)):
     """
     Get the announce by id
@@ -28,11 +29,15 @@ def get_announce_by_user_id(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[AnnounceSchema])
-def get_announces(db: Session = Depends(get_db)):
+def get_announces(
+        start: Optional[int] = None,
+        end: Optional[int] = None,
+        db: Session = Depends(get_db)
+):
     """
     Get all announces
     """
-    return AnnounceController.get_all(db)
+    return AnnounceController.get_all(db, start, end)
 
 
 @router.post("/", response_model=AnnounceSchema, status_code=status.HTTP_201_CREATED)
@@ -63,6 +68,18 @@ def update_announce(announce: AnnounceUpdateSchema, db: Session = Depends(get_db
     return AnnounceController.update(db, announce)
 
 
+@router.put(
+    "/itinerary/{announce_id}",
+    response_model=AnnounceSchema,
+    dependencies=[Depends(JWTBearer())]
+)
+def update_announce_with_itinerary(announce_id: int, announce: AnnounceItineraryInOptionalSchema, db: Session = Depends(get_db)):
+    """
+    Update an announce and itinerary
+    """
+    return AnnounceController.update_with_itinerary(db, announce, announce_id)
+
+
 @router.delete(
     "/{id}/{user_id}",
     response_model=AnnounceSchema,
@@ -72,6 +89,7 @@ def delete_announce(id: int, user_id: str, db: Session = Depends(get_db)):
     """
     Delete an announce
     """
+    print(user_id)
     return AnnounceController.delete(db, id)
 
 ###############################################################################
