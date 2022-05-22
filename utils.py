@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, DateTime
 from sqlalchemy.sql import func
 from config import SessionLocal, Base
-from user.schemas import UserInSchema, SocietyInSchema, PersonInSchema
 from typing import Union
 from fastapi import UploadFile, HTTPException, status
 import uuid
@@ -48,22 +47,47 @@ def copy_value(
                 setattr(model, key, value)
 
 
-def create_file(old_file_name: Union[str, None] = None, file_location: Union[str, int] = '', file: UploadFile = '') -> str:
+def create_file(
+        file_dir: str,
+        old_file_name: Union[str, None] = None,
+        file_location: Union[str, int] = '',
+        file: UploadFile = '',
+) -> str:
+    create_dirs()
     if old_file_name is not None:
-        file_path = join(Path(__file__).parent.parent.absolute(), old_file_name)
+        file_path = join(Path(__file__).parent.absolute(), old_file_name)
         if exists(file_path):
             os.remove(file_path)
-    file_location = f"static/{file_location}_{uuid.uuid4()}.{file.filename.split('.')[-1]}"
+    file_location = f"static/{file_dir}/{file_location}_{uuid.uuid4()}.{file.filename.split('.')[-1]}"
     with open(file_location, "wb+") as file_object:
         file_object.write(file.file.read())
     return file_location
 
 
-def create_file_with_bytes(bytes_file: bytes, file_location: str = '', file_ext: str = '') -> str:
-    file_location = f"static/{file_location}_{uuid.uuid4()}.{file_ext}"
+def create_file_with_bytes(file_dir: str, bytes_file: bytes, file_location: str = '', file_ext: str = '', old_file_name: str = None) -> str:
+    create_dirs()
+    file_location = f"static/{file_dir}/{file_location}_{uuid.uuid4()}.{file_ext}"
     with open(file_location, "wb+") as file_object:
         file_object.write(bytes_file)
+    if old_file_name is not None:
+        print(delete_file(old_file_name))
     return file_location
+
+
+def create_dirs():
+    locations = ['user', 'announce']
+    # Create folder if not exist
+    for d in locations:
+        if not exists(f'static/{d}'):
+            os.makedirs(f'static/{d}')
+
+
+def delete_file(file_location: str = '') -> bool:
+    file_path = join(Path(__file__).parent.absolute(), file_location)
+    if exists(file_path):
+        os.remove(file_path)
+        return True
+    return False
 
 
 fields_translate = {

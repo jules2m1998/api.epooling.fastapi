@@ -24,7 +24,7 @@ def get_order(id: int, db: Session = Depends(get_db)):
     return OrderController.get_by_id(db, id)
 
 
-@router.post("/", response_model=OrderSchema)
+@router.post("/", response_model=OrderSchema, status_code=status.HTTP_201_CREATED)
 def create_order(order: OrderInSchema, db: Session = Depends(get_db)):
     """
     Create new order

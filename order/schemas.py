@@ -19,8 +19,10 @@ class AnnounceSchema(BaseModel):
 class OrderSchema(BaseModel):
     id: int
     is_accepted: bool = False
+    is_denied: bool = False
     is_delivered_agent: bool = False
     is_delivered_client: bool = False
+    message: str = None
 
     user_id: int
     announce_id: int
@@ -35,10 +37,13 @@ class OrderSchema(BaseModel):
 class OrderInSchema(BaseModel):
     user_id: int
     announce_id: int
+    is_denied: bool = False
+    message: str = None
 
 
 class OrderUpdateSchema(BaseModel):
     id: int
     is_accepted: bool = False
+    is_denied: bool = False
     is_delivered_agent: bool = False
     is_delivered_client: bool = False

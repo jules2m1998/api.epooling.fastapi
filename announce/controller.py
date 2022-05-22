@@ -54,8 +54,9 @@ class AnnounceController:
                 description=announce.description,
                 image=create_file_with_bytes(
                     bytes_file=image_data,
-                    file_location=f'announce/{announce.user_id}',
-                    file_ext=ext
+                    file_location=f'{announce.user_id}',
+                    file_ext=ext,
+                    file_dir='announce'
                 ),
                 volume=announce.volume,
                 user_id=announce.user_id
@@ -142,11 +143,21 @@ class AnnounceController:
         _announce: Announce = AnnounceController.get_by_id(db, _id)
         announce_schema = AnnounceInOptionalSchema(**announce.dict())
         try:
-            copy_value(_announce, announce_schema)
+            copy_value(_announce, announce_schema, ['image'])
             if announce.itinerary:
                 it = db.query(Itinerary).filter(Itinerary.announce_id == _announce.id).first()
                 db.delete(it)
                 AnnounceController.create_itinerary_cities(db, announce.itinerary, _announce.id)
+            if announce.image:
+                image_data = base64.b64decode(re.sub(file_base64_regex, '', announce.image))
+                ext = imghdr.what('', image_data)
+                _announce.image = create_file_with_bytes(
+                    bytes_file=image_data,
+                    file_location=f'{announce.user_id}',
+                    file_ext=ext,
+                    old_file_name=_announce.image,
+                    file_dir='announce'
+                )
             db.commit()
             return _announce
         except Exception as e:

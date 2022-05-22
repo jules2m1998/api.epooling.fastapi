@@ -47,8 +47,10 @@ class ItinerarySchema(BaseModel):
 class OrderSchema(BaseModel):
     id: int
     is_accepted: bool = False
+    is_denied: bool = False
     is_delivered_agent: bool = False
     is_delivered_client: bool = False
+    message: str
 
     user_id: int
     announce_id: int

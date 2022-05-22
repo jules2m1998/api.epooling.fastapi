@@ -128,9 +128,18 @@ class Controller:
         print(u.avatar)
         if not Controller.phone_number_exist(u.phone, db):
             if _u.avatar_url and u.avatar:
-                _u.avatar_url = create_file(old_file_name=_u.avatar_url, file_location=str(_u.id), file=u.avatar)
+                _u.avatar_url = create_file(
+                    old_file_name=_u.avatar_url,
+                    file_location=str(_u.id),
+                    file=u.avatar, file_dir='user'
+                )
             elif u.avatar:
-                _u.avatar_url = create_file(old_file_name=None, file_location=str(_u.id), file=u.avatar)
+                _u.avatar_url = create_file(
+                    old_file_name=None,
+                    file_location=str(_u.id),
+                    file=u.avatar,
+                    file_dir='user'
+                )
             copy_value(_u, u, ['avatar'])
             db.commit()
             db.refresh(_u)

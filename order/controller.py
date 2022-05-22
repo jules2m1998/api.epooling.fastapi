@@ -33,6 +33,7 @@ class OrderController:
 
     @staticmethod
     def update(db: Session, order: OrderUpdateSchema):
+        print(order)
         _o = OrderController.get_by_id(db, order.id)
         for key, value in order.dict().items():
             if key != 'id':
