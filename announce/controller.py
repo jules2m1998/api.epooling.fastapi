@@ -110,7 +110,7 @@ class AnnounceController:
                     if start_it.order < end_it.order and start_it.date > datetime.now():
                         result.append(it)
             return result
-        return db.query(Announce).order_by(Announce.created_at.desc()).all()
+        return db.query(Announce).join(Itinerary).filter(Itinerary.start_date > datetime.now()).order_by(Announce.created_at.desc()).all()
 
     @staticmethod
     def get_all_by_user_id(db: Session, user_id: int):

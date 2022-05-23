@@ -16,6 +16,14 @@ def get_orders(db: Session = Depends(get_db)):
     return OrderController.get_all(db)
 
 
+@router.get("/user/{user_id}", response_model=List[OrderSchema])
+def get_orders_by_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get all orders
+    """
+    return OrderController.get_by_user_id(db, user_id)
+
+
 @router.get("/{id}", response_model=OrderSchema)
 def get_order(id: int, db: Session = Depends(get_db)):
     """
