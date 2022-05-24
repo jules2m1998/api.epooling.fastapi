@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from user.schemas import UserSchema
 from typing import Optional
+from announce.schemas import ItinerarySchema
 
 
 class AnnounceSchema(BaseModel):
@@ -11,6 +12,7 @@ class AnnounceSchema(BaseModel):
     is_delivery: bool
     user_id: int
     user: Optional[UserSchema]
+    itinerary: Optional[ItinerarySchema]
 
     class Config:
         orm_mode = True

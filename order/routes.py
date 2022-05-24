@@ -48,10 +48,10 @@ def update_order(order: OrderUpdateSchema, db: Session = Depends(get_db)):
     return OrderController.update(db, order)
 
 
-@router.delete("/{id}", response_model=OrderSchema)
-def delete_order(id: int, db: Session = Depends(get_db)):
+@router.delete("/{order_id}", response_model=OrderSchema)
+def delete_order(order_id: int, db: Session = Depends(get_db)):
     """
     Delete order
     """
-    return OrderController.delete(db, id)
+    return OrderController.delete(db, order_id)
 

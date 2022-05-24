@@ -43,4 +43,4 @@ class OrderController:
 
     @staticmethod
     def get_by_user_id(db: Session, user_id: int):
-        return db.query(Order).filter(Order.user_id == user_id).all()
+        return db.query(Order).filter(Order.user_id == user_id).filter(Order.is_delivered_client == False).all()
