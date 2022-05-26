@@ -40,40 +40,50 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.exception_handler(RequestValidationError)
 @app.exception_handler(ValidationError)
 async def validation_exception_handler(request, exc: Union[RequestValidationError, ValidationError]):
-    print(f"OMG! The client sent invalid data!: {exc}")
-    exc_json = json.loads(exc.json())
-    response = {"detail": []}
-    print(exc_json)
+    print(exc, 'exc')
+    try:
+        print(f"OMG! The client sent invalid data!: {exc}")
+        exc_json = json.loads(exc.json())
+        response = {"detail": []}
+        print(exc_json)
 
-    for error in exc_json:
-        field: str = str(error["loc"][-1]).lower()
-        translate: str = fields_translate.get(field)
-        message = ''
-        typer, value = error["type"].split('.')
-        if translate:
-            field = translate.capitalize()
-        else:
-            field = field.replace("_", " ").capitalize()
-        if'type_error' in typer:
-            if 'integer' in value:
-                message = f"{field} doit être un nombre entier"
-            elif 'string' in value:
-                message = f"{field} doit être une chaîne de caractères"
-            elif 'boolean' in value:
-                message = f"{field} doit être un booléen"
+        for error in exc_json:
+            field: str = str(error["loc"][-1]).lower()
+            translate: str = fields_translate.get(field)
+            print('field: ', field)
+            print('translate: ', translate)
+            message = ''
+            typer, value = error["type"].split('.')
+            if translate:
+                field = translate.capitalize()
             else:
-                message = f"{field} n'est pas dubon type"
-        elif 'value_error' in typer:
-            if 'missing' in value:
-                message = f"{field} est obligatoire"
+                field = field.replace("_", " ").capitalize()
+            if'type_error' in typer:
+                if 'integer' in value:
+                    message = f"{field} doit être un nombre entier"
+                elif 'string' in value:
+                    message = f"{field} doit être une chaîne de caractères"
+                elif 'boolean' in value:
+                    message = f"{field} doit être un booléen"
+                else:
+                    message = f"{field} n'est pas dubon type"
+            elif 'value_error' in typer:
+                if 'missing' in value:
+                    message = f"{field} est obligatoire"
+            else:
+                message = error['msg']
+            response['detail'].append({
+                'fieldTrans': field,
+                'message': message,
+                'field': str(error["loc"][-1]).lower()
+            })
+            print(response)
+    except Exception as e:
+        print(isinstance(e, ValueError))
+        if isinstance(e, ValueError):
+            response = {"detail": [{"message": "Veillez remplir tous les champs !", "field": "all"}]}
         else:
-            message = error['msg']
-        response['detail'].append({
-            'fieldTrans': field,
-            'message': message,
-            'field': str(error["loc"][-1]).lower()
-        })
-
+            response = {"detail": [{"fieldTrans": "", "message": "Une erreur s'est produite", "field": "all"}]}
     return JSONResponse(response, status_code=422)
 
 

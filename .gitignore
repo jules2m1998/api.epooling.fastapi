@@ -160,3 +160,6 @@ cython_debug/
 .idea/
 
 /static/
+
+!static/default-user.webp
+!static/default-society.png

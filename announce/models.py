@@ -18,7 +18,8 @@ class Announce(BaseModel, Base):
         'Order',
         back_populates='announce',
         cascade="all,  delete-orphan, save-update",
-        lazy='joined'
+        lazy='joined',
+        order_by="Order.created_at.desc()"
     )
     itinerary = relationship(
         'Itinerary',

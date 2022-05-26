@@ -41,10 +41,11 @@ class Controller:
             if avatar is not None:
                 file_location = create_file(
                     file_location=u.account_id,
-                    file=avatar
+                    file=avatar,
+                    file_dir='user'
                 )
             else:
-                file_location = None
+                file_location = 'static/default-user.webp'
 
             u.avatar_url = file_location
             _u = create_user_method(u=UserSchema(**u.dict(), id=0))
@@ -70,10 +71,12 @@ class Controller:
         if avatar is not None:
             file_location = create_file(
                 file_location=u.account_id,
-                file=avatar
+                file=avatar,
+                file_dir='user'
             )
+
         else:
-            file_location = None
+            file_location = 'static/default-society.png'
 
         u.avatar_url = file_location
         _u = create_user_method(u=UserSchema(**u.dict(), id=0))

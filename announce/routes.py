@@ -49,7 +49,7 @@ def create_announce(announce: AnnounceInSchema, db: Session = Depends(get_db)):
 
 
 @router.post("/itinerary", response_model=AnnounceSchema, status_code=status.HTTP_201_CREATED)
-def create_announce(announce: AnnounceItineraryInSchema, db: Session = Depends(get_db)):
+def create_announce_itinerary(announce: AnnounceItineraryInSchema, db: Session = Depends(get_db)):
     """
     Create a new announce with itinerary
     """
