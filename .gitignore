@@ -159,7 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-/static/
-
-!static/default-user.webp
-!static/default-society.png
+/static/announce/*
+/static/user/*
